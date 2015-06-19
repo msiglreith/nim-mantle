@@ -5,7 +5,7 @@
 
 # todo: other OS, x86/x86_64
 when defined(windows):
-  {.pragma: libmantle, dynlib: "mantle64.dll".}
+  const libmantle* = "mantle64.dll"
 
 # Types
 type
@@ -113,6 +113,7 @@ const
 
   GR_MAX_COLOR_TARGETS*: GrSize = 16 # todo: verify!
   GR_MAX_DESCRIPTOR_SETS*: GrSize = 1 # todo: verify!
+  GR_MAX_DEVICE_NAME_LEN*: GrSize = 128 # todo: verify!
   GR_MAX_PHYSICAL_GPUS*: GrSize = 8 # todo: verify!
   GR_MAX_PHYSICAL_GPU_NAME*: GrSize = 128 # todo: verify!
   GR_MAX_MEMORY_HEAPS*: GrSize = 8 # todo: verify!
@@ -1078,146 +1079,146 @@ type
 
 
 # Functions
-{.push stdcall.}
+{.push callConv: stdcall, importc, dynLib: libmantle}
 # Initialization and Device Functions
-proc grInitAndEnumerateGpus*(pAppInfo: ptr GrApplicationInfo, pAllocCb: ptr GrAllocCallbacks, pGpuCount: ptr GrUint, gpus: array[GR_MAX_PHYSICAL_GPUS, GrPhysicalGpu]): GR_RESULT {.importc, libmantle.}
-proc grGetGpuInfo*(gpu: GrPhysicalGpu, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grCreateDevice*(gpu: GrPhysicalGpu, pCreateInfo: ptr GrDeviceCreateInfo, pDevice: ptr GrDevice): GR_RESULT {.importc, libmantle.}
-proc grDestroyDevice*(device: GrDevice): GR_RESULT {.importc, libmantle.}
+proc grInitAndEnumerateGpus*(pAppInfo: ptr GrApplicationInfo, pAllocCb: ptr GrAllocCallbacks, pGpuCount: ptr GrUint, gpus: array[GR_MAX_PHYSICAL_GPUS, GrPhysicalGpu]): GR_RESULT
+proc grGetGpuInfo*(gpu: GrPhysicalGpu, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grCreateDevice*(gpu: GrPhysicalGpu, pCreateInfo: ptr GrDeviceCreateInfo, pDevice: ptr GrDevice): GR_RESULT
+proc grDestroyDevice*(device: GrDevice): GR_RESULT
 
 # Extension Discovery Functions
-proc grGetExtensionSupport*(gpu: GrPhysicalGpu, pExtName: ptr GrChar): GR_RESULT {.importc, libmantle.}
+proc grGetExtensionSupport*(gpu: GrPhysicalGpu, pExtName: ptr GrChar): GR_RESULT
 
 # Queue Functions
-proc grGetDeviceQueue*(device: GrDevice, queueType: GrQueueType, queueId: GrUint, pQueue: ptr GrQueue): GR_RESULT {.importc, libmantle.}
-proc grQueueWaitIdle*(queue: GrQueue): GR_RESULT {.importc, libmantle.}
-proc grDeviceWaitIdle*(device: GrDevice): GR_RESULT {.importc, libmantle.}
-proc grQueueSubmit*(queue: GrQueue, cmdBufferCount: GrUint, pCmdBuffers: ptr GrCmdBuffer, memRefCount: GrUint, pMemRefs: ptr GrMemoryRef, fence: GrFence): GR_RESULT {.importc, libmantle.}
-proc grQueueSetGlobalMemReferences*(queue: GrQueue, memRefCount: GrUint, pMemRefs: GrMemoryRef): GR_RESULT {.importc, libmantle.}
+proc grGetDeviceQueue*(device: GrDevice, queueType: GrQueueType, queueId: GrUint, pQueue: ptr GrQueue): GR_RESULT
+proc grQueueWaitIdle*(queue: GrQueue): GR_RESULT
+proc grDeviceWaitIdle*(device: GrDevice): GR_RESULT
+proc grQueueSubmit*(queue: GrQueue, cmdBufferCount: GrUint, pCmdBuffers: ptr GrCmdBuffer, memRefCount: GrUint, pMemRefs: ptr GrMemoryRef, fence: GrFence): GR_RESULT
+proc grQueueSetGlobalMemReferences*(queue: GrQueue, memRefCount: GrUint, pMemRefs: GrMemoryRef): GR_RESULT
 
 # Memory Management Functions
-proc grGetMemoryHeapCount*(device: GrDevice, pCount: ptr GrUint): GR_RESULT {.importc, libmantle.}
-proc grGetMemoryHeapInfo*(device: GrDevice, heapId: GrUint, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grAllocMemory*(device: GrDevice, pAllocInfo: ptr GrMemoryAllocInfo, pMem: ptr GrGpuMemory): GR_RESULT {.importc, libmantle.}
-proc grFreeMemory*(mem: GrGpuMemory): GR_RESULT {.importc, libmantle.}
-proc grSetMemoryPriority*(mem: GrGpuMemory, priority: GrMemoryPriority): GR_RESULT {.importc, libmantle.}
-proc grMapMemory*(mem: GrGpuMemory, flags: GrFlags, ppData: ptr pointer): GR_RESULT {.importc, libmantle.}
-proc grUnmapMemory*(mem: GrGpuMemory): GR_RESULT {.importc, libmantle.}
-proc grRemapVirtualMemoryPages*(device: GrDevice, rangeCount: GrUint, pRanges: ptr GrVirtualMemoryRemapRange, preWaitSemaphoreCount: ptr GrQueueSemaphore, postSignalSemaphoreCount: GrUint, pPostSignalSemaphores: ptr GrQueueSemaphore): GR_RESULT {.importc, libmantle.}
-proc grPinSystemMemory*(device: GrDevice, pSysMem: pointer, memSize: GrSize, pMem: ptr GrGpuMemory): GR_RESULT {.importc, libmantle.}
+proc grGetMemoryHeapCount*(device: GrDevice, pCount: ptr GrUint): GR_RESULT
+proc grGetMemoryHeapInfo*(device: GrDevice, heapId: GrUint, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grAllocMemory*(device: GrDevice, pAllocInfo: ptr GrMemoryAllocInfo, pMem: ptr GrGpuMemory): GR_RESULT
+proc grFreeMemory*(mem: GrGpuMemory): GR_RESULT
+proc grSetMemoryPriority*(mem: GrGpuMemory, priority: GrMemoryPriority): GR_RESULT
+proc grMapMemory*(mem: GrGpuMemory, flags: GrFlags, ppData: ptr pointer): GR_RESULT
+proc grUnmapMemory*(mem: GrGpuMemory): GR_RESULT
+proc grRemapVirtualMemoryPages*(device: GrDevice, rangeCount: GrUint, pRanges: ptr GrVirtualMemoryRemapRange, preWaitSemaphoreCount: ptr GrQueueSemaphore, postSignalSemaphoreCount: GrUint, pPostSignalSemaphores: ptr GrQueueSemaphore): GR_RESULT
+proc grPinSystemMemory*(device: GrDevice, pSysMem: pointer, memSize: GrSize, pMem: ptr GrGpuMemory): GR_RESULT
 
 # Generic API Object Management Functions
-proc grDestroyObject*(obj: GrObject): GR_RESULT {.importc, libmantle.}
-proc grGetObjectInfo*(obj: GrObject, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grBindObjectMemory*(obj: GrObject, mem: GrGpuMemory, offset: GrGpuSize): GR_RESULT {.importc, libmantle.}
+proc grDestroyObject*(obj: GrObject): GR_RESULT
+proc grGetObjectInfo*(obj: GrObject, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grBindObjectMemory*(obj: GrObject, mem: GrGpuMemory, offset: GrGpuSize): GR_RESULT
 
 # Image and Sampler Functions
-proc grGetFormatInfo*(device: GrDevice, format: GrFormat, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grCreateImage*(device: GrDevice, pCreateInfo: ptr GrImageCreateInfo, pImage: ptr GrImage): GR_RESULT {.importc, libmantle.}
-proc grGetImageSubresourceInfo*(image: GrImage, pSubresource: ptr GrImageSubresource, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grCreateSampler*(device: GrDevice, pCreateInfo: ptr GrSamplerCreateInfo, pSampler: ptr GrSampler): GR_RESULT {.importc, libmantle.}
+proc grGetFormatInfo*(device: GrDevice, format: GrFormat, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grCreateImage*(device: GrDevice, pCreateInfo: ptr GrImageCreateInfo, pImage: ptr GrImage): GR_RESULT
+proc grGetImageSubresourceInfo*(image: GrImage, pSubresource: ptr GrImageSubresource, infoType: GrInfoType, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grCreateSampler*(device: GrDevice, pCreateInfo: ptr GrSamplerCreateInfo, pSampler: ptr GrSampler): GR_RESULT
 
 # Image View Functions
-proc grCreateImageView*(device: GrDevice, pCreateInfo: ptr GrImageViewCreateInfo, pView: ptr GrImageView): GR_RESULT {.importc, libmantle.}
-proc grCreateColorTargetView*(device: GrDevice, pCreateInfo: ptr GrColorTargetViewCreateInfo, pView: GrColorTargetView): GR_RESULT {.importc, libmantle.}
-proc grCreateDepthStencilView*(device: GrDevice, pCreateInfo: ptr GrDepthStencilViewCreateInfo, pView: GrDepthStencilView): GR_RESULT {.importc, libmantle.}
+proc grCreateImageView*(device: GrDevice, pCreateInfo: ptr GrImageViewCreateInfo, pView: ptr GrImageView): GR_RESULT
+proc grCreateColorTargetView*(device: GrDevice, pCreateInfo: ptr GrColorTargetViewCreateInfo, pView: GrColorTargetView): GR_RESULT
+proc grCreateDepthStencilView*(device: GrDevice, pCreateInfo: ptr GrDepthStencilViewCreateInfo, pView: GrDepthStencilView): GR_RESULT
 
 # Shader and Pipeline Functions
-proc grCreateShader*(device: GrDevice, pCreateInfo: ptr GrShaderCreateInfo, pShader: ptr GrShader): GR_RESULT {.importc, libmantle.}
-proc grCreateGraphicsPipeline*(device: GrDevice, pCreateInfo: ptr GrGraphicsPipelineCreateInfo, pPipeline: ptr GrPipeline): GR_RESULT {.importc, libmantle.}
-proc grCreateComputePipeline*(device: GrDevice, pCreateInfo: ptr GrComputePipelineCreateInfo, pPipeline: ptr GrPipeline): GR_RESULT {.importc, libmantle.}
-proc grStorePipeline*(pipeline: GrPipeline, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grLoadPipeline*(device: GrDevice, dataSize: GrSize, pData: pointer, pPipeline: ptr GrPipeline): GR_RESULT {.importc, libmantle.}
+proc grCreateShader*(device: GrDevice, pCreateInfo: ptr GrShaderCreateInfo, pShader: ptr GrShader): GR_RESULT
+proc grCreateGraphicsPipeline*(device: GrDevice, pCreateInfo: ptr GrGraphicsPipelineCreateInfo, pPipeline: ptr GrPipeline): GR_RESULT
+proc grCreateComputePipeline*(device: GrDevice, pCreateInfo: ptr GrComputePipelineCreateInfo, pPipeline: ptr GrPipeline): GR_RESULT
+proc grStorePipeline*(pipeline: GrPipeline, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grLoadPipeline*(device: GrDevice, dataSize: GrSize, pData: pointer, pPipeline: ptr GrPipeline): GR_RESULT
 
 # Descriptor Set Functions
-proc grCreateDescriptorSet*(device: GrDevice, pCreateInfo: ptr GrDescriptorSetCreateInfo, pDescriptorSet: ptr GrDescriptorSet): GR_RESULT {.importc, libmantle.}
-proc grBeginDescriptorSetUpdate*(descriptorSet: GrDescriptorSet): GR_RESULT {.importc, libmantle.}
-proc grEndDescriptorSetUpdate*(descriptorSet: GrDescriptorSet): GR_RESULT {.importc, libmantle.}
-proc grAttachSamplerDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pSamplers: ptr GrSampler): GR_RESULT {.importc, libmantle.}
-proc grAttachImageViewDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pImageViews: ptr GrImageViewAttachInfo): GR_RESULT {.importc, libmantle.}
-proc grAttachMemoryViewDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pMemView: ptr GrMemoryViewAttachInfo): GR_RESULT {.importc, libmantle.}
-proc grAttachNestedDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pNestedDescriptorSets: ptr GrDescriptorSetAttachInfo): GR_RESULT {.importc, libmantle.}
-proc grClearDescriptorSetSlots*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint): GR_RESULT {.importc, libmantle.}
+proc grCreateDescriptorSet*(device: GrDevice, pCreateInfo: ptr GrDescriptorSetCreateInfo, pDescriptorSet: ptr GrDescriptorSet): GR_RESULT
+proc grBeginDescriptorSetUpdate*(descriptorSet: GrDescriptorSet): GR_RESULT
+proc grEndDescriptorSetUpdate*(descriptorSet: GrDescriptorSet): GR_RESULT
+proc grAttachSamplerDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pSamplers: ptr GrSampler): GR_RESULT
+proc grAttachImageViewDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pImageViews: ptr GrImageViewAttachInfo): GR_RESULT
+proc grAttachMemoryViewDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pMemView: ptr GrMemoryViewAttachInfo): GR_RESULT
+proc grAttachNestedDescriptors*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint, pNestedDescriptorSets: ptr GrDescriptorSetAttachInfo): GR_RESULT
+proc grClearDescriptorSetSlots*(descriptorSet: GrDescriptorSet, startSlot: GrUint, slotCount: GrUint): GR_RESULT
 
 # State Object Functions
-proc grCreateViewportState*(device: GrDevice, pCreateInfo: ptr GrViewportStateCreateInfo, pState: ptr GrViewportStateObject): GR_RESULT {.importc, libmantle.}
-proc grCreateRasterState*(device: GrDevice, pCreateInfo: ptr GrRasterStateCreateInfo, pState: ptr GrRasterStateObject): GR_RESULT {.importc, libmantle.}
-proc grCreateColorBlendState*(device: GrDevice, pCreateInfo: ptr GrColorBlendStateCreateInfo, pState: ptr GrColorBlendStateObject): GR_RESULT {.importc, libmantle.}
-proc grCreateDepthStencilState*(device: GrDevice, pCreateInfo: ptr GrDepthStencilStateCreateInfo, pState: ptr GrDepthStencilStateObject): GR_RESULT {.importc, libmantle.}
-proc grCreateMsaaState*(device: GrDevice, pCreateInfo: ptr GrMsaaStateCreateInfo, pState: ptr GrMsaaStateObject): GR_RESULT {.importc, libmantle.}
+proc grCreateViewportState*(device: GrDevice, pCreateInfo: ptr GrViewportStateCreateInfo, pState: ptr GrViewportStateObject): GR_RESULT
+proc grCreateRasterState*(device: GrDevice, pCreateInfo: ptr GrRasterStateCreateInfo, pState: ptr GrRasterStateObject): GR_RESULT
+proc grCreateColorBlendState*(device: GrDevice, pCreateInfo: ptr GrColorBlendStateCreateInfo, pState: ptr GrColorBlendStateObject): GR_RESULT
+proc grCreateDepthStencilState*(device: GrDevice, pCreateInfo: ptr GrDepthStencilStateCreateInfo, pState: ptr GrDepthStencilStateObject): GR_RESULT
+proc grCreateMsaaState*(device: GrDevice, pCreateInfo: ptr GrMsaaStateCreateInfo, pState: ptr GrMsaaStateObject): GR_RESULT
 
 # Query and Synchronization Functions
-proc grCreateQueryPool*(device: GrDevice, pCreateInfo: ptr GrQueryPoolCreateInfo, pQueryPool: ptr GrQueryPool): GR_RESULT {.importc, libmantle.}
-proc grGetQueryPoolResults*(queryPool: GrQueryPool, startQuery: GrUint, queryCount: GrUint, pDataSize: ptr GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grCreateFence*(device: GrDevice, pCreateInfo: ptr GrFenceCreateInfo, pFence: ptr GrFence): GR_RESULT {.importc, libmantle.}
-proc grGetFenceStatus*(fence: GrFence): GR_RESULT {.importc, libmantle.}
-proc grWaitForFences*(device: GrDevice, fenceCount: GrUint, pFences: ptr GrFence, waitAll: GrBool, timeout: GrFloat): GR_RESULT {.importc, libmantle.}
-proc grCreateQueueSemaphore*(device: GrDevice, pCreateInfo: ptr GrQueueSemaphoreCreateInfo): GR_RESULT {.importc, libmantle.}
-proc grSignalQueueSemaphore*(queue: GrQueue, semaphore: GrQueueSemaphore): GR_RESULT {.importc, libmantle.}
-proc grWaitQueueSemaphore*(queue: GrQueue, semaphore: GrQueueSemaphore): GR_RESULT {.importc, libmantle.}
-proc grCreateEvent*(device: GrDevice, pCreateInfo: ptr GrEventCreateInfo, pEvent: ptr GrEvent): GR_RESULT {.importc, libmantle.}
-proc grGetEventStatus*(event: GrEvent): GR_RESULT {.importc, libmantle.}
-proc grSetEvent*(event: GrEvent): GR_RESULT {.importc, libmantle.}
-proc grResetEvent*(event: GrEvent): GR_RESULT {.importc, libmantle.}
+proc grCreateQueryPool*(device: GrDevice, pCreateInfo: ptr GrQueryPoolCreateInfo, pQueryPool: ptr GrQueryPool): GR_RESULT
+proc grGetQueryPoolResults*(queryPool: GrQueryPool, startQuery: GrUint, queryCount: GrUint, pDataSize: ptr GrSize, pData: pointer): GR_RESULT
+proc grCreateFence*(device: GrDevice, pCreateInfo: ptr GrFenceCreateInfo, pFence: ptr GrFence): GR_RESULT
+proc grGetFenceStatus*(fence: GrFence): GR_RESULT
+proc grWaitForFences*(device: GrDevice, fenceCount: GrUint, pFences: ptr GrFence, waitAll: GrBool, timeout: GrFloat): GR_RESULT
+proc grCreateQueueSemaphore*(device: GrDevice, pCreateInfo: ptr GrQueueSemaphoreCreateInfo): GR_RESULT
+proc grSignalQueueSemaphore*(queue: GrQueue, semaphore: GrQueueSemaphore): GR_RESULT
+proc grWaitQueueSemaphore*(queue: GrQueue, semaphore: GrQueueSemaphore): GR_RESULT
+proc grCreateEvent*(device: GrDevice, pCreateInfo: ptr GrEventCreateInfo, pEvent: ptr GrEvent): GR_RESULT
+proc grGetEventStatus*(event: GrEvent): GR_RESULT
+proc grSetEvent*(event: GrEvent): GR_RESULT
+proc grResetEvent*(event: GrEvent): GR_RESULT
 
 # Multi-Device Management Functions
-proc grGetMultiGpuCompatibility*(gpu0, GrPhysicalGpu, gpu1: GrPhysicalGpu, pInfo: ptr GrGpuCompatibilityInfo): GR_RESULT {.importc, libmantle.}
-proc grOpenSharedMemory*(device: GrDevice, pOpenInfo: ptr GrMemoryOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT {.importc, libmantle.}
-proc grOpenSharedQueueSemaphore*(device: GrDevice, pOpenInfo: ptr GrQueueSemaphoreOpenInfo, pSemaphore: ptr GrQueueSemaphore): GR_RESULT {.importc, libmantle.}
-proc grOpenPeerMemory*(device: GrDevice, pOpenInfo: ptr GrPeerMemoryOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT {.importc, libmantle.}
-proc grOpenPeerImage*(device: GrDevice, pOpenInfo: ptr GrPeerImageOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT {.importc, libmantle.}
+proc grGetMultiGpuCompatibility*(gpu0, GrPhysicalGpu, gpu1: GrPhysicalGpu, pInfo: ptr GrGpuCompatibilityInfo): GR_RESULT
+proc grOpenSharedMemory*(device: GrDevice, pOpenInfo: ptr GrMemoryOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT
+proc grOpenSharedQueueSemaphore*(device: GrDevice, pOpenInfo: ptr GrQueueSemaphoreOpenInfo, pSemaphore: ptr GrQueueSemaphore): GR_RESULT
+proc grOpenPeerMemory*(device: GrDevice, pOpenInfo: ptr GrPeerMemoryOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT
+proc grOpenPeerImage*(device: GrDevice, pOpenInfo: ptr GrPeerImageOpenInfo, pMem: ptr GrGpuMemory): GR_RESULT
 
 # Command Buffer Management Functions
-proc grCreateCommandBuffer*(device: GrDevice, pCreateInfo: ptr GrCmdBufferCreateInfo, pCmdBuffer: ptr GrCmdBuffer): GR_RESULT {.importc, libmantle.}
-proc grBeginCommandBuffer*(cmdBuffer: GrCmdBuffer, flags: GrFlags): GR_RESULT {.importc, libmantle.}
-proc grEndCommandBuffer*(cmdBuffer: GrCmdBuffer): GR_RESULT {.importc, libmantle.}
-proc grResetCommandBuffer*(cmdBuffer: GrCmdBuffer): GR_RESULT {.importc, libmantle.}
+proc grCreateCommandBuffer*(device: GrDevice, pCreateInfo: ptr GrCmdBufferCreateInfo, pCmdBuffer: ptr GrCmdBuffer): GR_RESULT
+proc grBeginCommandBuffer*(cmdBuffer: GrCmdBuffer, flags: GrFlags): GR_RESULT
+proc grEndCommandBuffer*(cmdBuffer: GrCmdBuffer): GR_RESULT
+proc grResetCommandBuffer*(cmdBuffer: GrCmdBuffer): GR_RESULT
 
 # Command Buffer Building Functions
-proc grCmdBindPipeline*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, pipeline: GrPipeline) {.importc, libmantle.}
-proc grCmdBindStateObject*(cmdBuffer: GrCmdBuffer, stateBindPoint: GrStateBindPoint, state: GrStateObject) {.importc, libmantle.}
-proc grCmdBindDescriptorSet*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, index: GrUint, descriptorSet: GrDescriptorSet, slotOffset: GrUint) {.importc, libmantle.}
-proc grCmdBindDynamicMemoryView*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, pMemView: ptr GrMemoryViewAttachInfo) {.importc, libmantle.}
-proc grCmdBindIndexData*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize, indexType: GrIndexType) {.importc, libmantle.}
-proc grCmdBindTargets*(cmdBuffer: GrCmdBuffer, colorTargetCount: GrUint, pColorTargets: ptr GrColorTargetBindInfo, pDepthTarget: ptr GrDepthStencilBindInfo) {.importc, libmantle.}
-proc grCmdPrepareMemoryRegions*(cmdBuffer: GrCmdBuffer, transitionCount: GrUint, pStateTransitions: ptr GrMemoryStateTransition) {.importc, libmantle.}
-proc grCmdPrepareImages*(cmdBuffer: GrCmdBuffer, transitionCount: GrUint, pStateTransitions: ptr GrImageStateTransition) {.importc, libmantle.}
-proc grCmdDraw*(cmdBuffer: GrCmdBuffer, firstVertex: GrUint, vertexCount: GrUint, firstInstance: GrUint, instanceCount: GrUint) {.importc, libmantle.}
-proc grCmdDrawIndexed*(cmdBuffer: GrCmdBuffer, firstIndex: GrUint, indexCount: GrUint, vertexOffset: GrInt, firstInstance: GrUint, instanceCount: GrUint) {.importc, libmantle.}
-proc grCmdDrawIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize) {.importc, libmantle.}
-proc grCmdDrawIndexedIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize) {.importc, libmantle.}
-proc grCmdDispatch*(cmdBuffer, GrCmdBuffer, x: GrUint, y: GrUint, z: GrUint) {.importc, libmantle.}
-proc grCmdDispatchIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize) {.importc, libmantle.}
-proc grCmdCopyMemory*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, destMem: GrGpuMemory, regionCount: GrUint, pRegions: ptr GrMemoryCopy) {.importc, libmantle.}
-proc grCmdCopyImage*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrImageCopy) {.importc, libmantle.}
-proc grCmdCopyMemoryToImage*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrMemoryImageCopy) {.importc, libmantle.}
-proc grCmdCopyImageToMemory*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destMem: GrGpuMemory, regionCount: GrUint, pRegions: ptr GrMemoryImageCopy) {.importc, libmantle.}
-proc grCmdResolveImage*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrImageResolve) {.importc, libmantle.}
-proc grCmdCloneImageData*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, srcImageState: GrImageState, destImage: GrImage, destImageState: GrImageState) {.importc, libmantle.}
-proc grCmdUpdateMemory*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, dataSize: GrGpuSize, pData: pointer) {.importc, libmantle.}
-proc grCmdFillMemory*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, fillSize: GrGpuSize, data: GrUint32) {.importc, libmantle.}
-proc grCmdClearColorImage*(cmdBuffer: GrCmdBuffer, image: GrImage, color: array[4, GrFloat], rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange) {.importc, libmantle.}
-proc grCmdClearColorImageRaw*(cmdBuffer: GrCmdBuffer, image: GrImage, color: array[4, GrUint32], rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange) {.importc, libmantle.}
-proc grCmdClearDepthStencil*(cmdBuffer: GrCmdBuffer, image: GrImage, depth: GrFloat, stencil: GrUint8, rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange) {.importc, libmantle.}
-proc grCmdSetEvent*(cmdBuffer: GrCmdBuffer, event: GrEvent) {.importc, libmantle.}
-proc grCmdResetEvent*(cmdBuffer: GrCmdBuffer, event: GrEvent) {.importc, libmantle.}
-proc grCmdMemoryAtomic*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, srcData: GrUint64, atomicOp: GrAtomicOp) {.importc, libmantle.}
-proc grCmdBeginQuery*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, slot: GrUint, flags: GrFlags) {.importc, libmantle.}
-proc grCmdEndQuery*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, slot: GrUint) {.importc, libmantle.}
-proc grCmdResetQueryPool*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, startQuery: GrUint, queryCount: GrUint) {.importc, libmantle.}
-proc grCmdWriteTimestamp*(cmdBuffer: GrCmdBuffer, timestampType: GrTimestampType, destMem: GrGpuMemory, destOffset: GrGpuSize) {.importc, libmantle.}
-proc grCmdInitAtomicCounters*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, pData: ptr GrUint32) {.importc, libmantle.}
-proc grCmdLoadAtomicCounters*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, srcMem: GrGpuMemory, srcOffset: GrGpuSize) {.importc, libmantle.}
-proc grCmdSaveAtomicCounters*(cmdBuffer, GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, destMem: GrGpuMemory, destOffset: GrGpuSize) {.importc, libmantle.}
+proc grCmdBindPipeline*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, pipeline: GrPipeline)
+proc grCmdBindStateObject*(cmdBuffer: GrCmdBuffer, stateBindPoint: GrStateBindPoint, state: GrStateObject)
+proc grCmdBindDescriptorSet*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, index: GrUint, descriptorSet: GrDescriptorSet, slotOffset: GrUint)
+proc grCmdBindDynamicMemoryView*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, pMemView: ptr GrMemoryViewAttachInfo)
+proc grCmdBindIndexData*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize, indexType: GrIndexType)
+proc grCmdBindTargets*(cmdBuffer: GrCmdBuffer, colorTargetCount: GrUint, pColorTargets: ptr GrColorTargetBindInfo, pDepthTarget: ptr GrDepthStencilBindInfo)
+proc grCmdPrepareMemoryRegions*(cmdBuffer: GrCmdBuffer, transitionCount: GrUint, pStateTransitions: ptr GrMemoryStateTransition)
+proc grCmdPrepareImages*(cmdBuffer: GrCmdBuffer, transitionCount: GrUint, pStateTransitions: ptr GrImageStateTransition)
+proc grCmdDraw*(cmdBuffer: GrCmdBuffer, firstVertex: GrUint, vertexCount: GrUint, firstInstance: GrUint, instanceCount: GrUint)
+proc grCmdDrawIndexed*(cmdBuffer: GrCmdBuffer, firstIndex: GrUint, indexCount: GrUint, vertexOffset: GrInt, firstInstance: GrUint, instanceCount: GrUint)
+proc grCmdDrawIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize)
+proc grCmdDrawIndexedIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize)
+proc grCmdDispatch*(cmdBuffer, GrCmdBuffer, x: GrUint, y: GrUint, z: GrUint)
+proc grCmdDispatchIndirect*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize)
+proc grCmdCopyMemory*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, destMem: GrGpuMemory, regionCount: GrUint, pRegions: ptr GrMemoryCopy)
+proc grCmdCopyImage*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrImageCopy)
+proc grCmdCopyMemoryToImage*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrMemoryImageCopy)
+proc grCmdCopyImageToMemory*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destMem: GrGpuMemory, regionCount: GrUint, pRegions: ptr GrMemoryImageCopy)
+proc grCmdResolveImage*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, destImage: GrImage, regionCount: GrUint, pRegions: ptr GrImageResolve)
+proc grCmdCloneImageData*(cmdBuffer: GrCmdBuffer, srcImage: GrImage, srcImageState: GrImageState, destImage: GrImage, destImageState: GrImageState)
+proc grCmdUpdateMemory*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, dataSize: GrGpuSize, pData: pointer)
+proc grCmdFillMemory*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, fillSize: GrGpuSize, data: GrUint32)
+proc grCmdClearColorImage*(cmdBuffer: GrCmdBuffer, image: GrImage, color: array[4, GrFloat], rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange)
+proc grCmdClearColorImageRaw*(cmdBuffer: GrCmdBuffer, image: GrImage, color: array[4, GrUint32], rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange)
+proc grCmdClearDepthStencil*(cmdBuffer: GrCmdBuffer, image: GrImage, depth: GrFloat, stencil: GrUint8, rangeCount: GrUint, pRanges: ptr GrImageSubresourceRange)
+proc grCmdSetEvent*(cmdBuffer: GrCmdBuffer, event: GrEvent)
+proc grCmdResetEvent*(cmdBuffer: GrCmdBuffer, event: GrEvent)
+proc grCmdMemoryAtomic*(cmdBuffer: GrCmdBuffer, destMem: GrGpuMemory, destOffset: GrGpuSize, srcData: GrUint64, atomicOp: GrAtomicOp)
+proc grCmdBeginQuery*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, slot: GrUint, flags: GrFlags)
+proc grCmdEndQuery*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, slot: GrUint)
+proc grCmdResetQueryPool*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, startQuery: GrUint, queryCount: GrUint)
+proc grCmdWriteTimestamp*(cmdBuffer: GrCmdBuffer, timestampType: GrTimestampType, destMem: GrGpuMemory, destOffset: GrGpuSize)
+proc grCmdInitAtomicCounters*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, pData: ptr GrUint32)
+proc grCmdLoadAtomicCounters*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, srcMem: GrGpuMemory, srcOffset: GrGpuSize)
+proc grCmdSaveAtomicCounters*(cmdBuffer, GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, startCounter: GrUint, counterCount: GrUint, destMem: GrGpuMemory, destOffset: GrGpuSize)
 
 # Debug and Validation
-proc grDbgSetValidationLevel*(device: GrDevice, validationLevel: GrValidationLevel): GR_RESULT {.importc, libmantle.}
-proc grDbgRegisterMsgCallback*(pfnMsgCallback: GrDbgMsgCallbackFunction, pUserData: pointer): GR_RESULT {.importc, libmantle.}
-proc grDbgUnregisterMsgCallback*(pfnMsgCallback: GrDbgMsgCallbackFunction): GR_RESULT {.importc, libmantle.}
-proc grDbgSetMessageFilter*(device: GrDevice, msgCode: GrDbgMsgCode, filter: GrDbgMsgFilter): GR_RESULT {.importc, libmantle.}
-proc grDbgSetObjectTag*(obj: GrBaseObject, tagSize: GrSize, pTag: pointer): GR_RESULT {.importc, libmantle.}
-proc grDbgSetGlobalOption*(dbgOption: GrDbgGlobalOption, dataSize: GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grDbgSetDeviceOption*(device: GrDevice, dbgOption: GrDbgDeviceOption, dataSize: GrSize, pData: pointer): GR_RESULT {.importc, libmantle.}
-proc grCmdDbgMarkerBegin*(cmdBuffer: GrCmdBuffer, pMarker: ptr GrChar) {.importc, libmantle.}
-proc grCmdDbgMarkerEnd*(cmdBuffer: GrCmdBuffer) {.importc, libmantle.}
-{.pop.} # stdcall,
+proc grDbgSetValidationLevel*(device: GrDevice, validationLevel: GrValidationLevel): GR_RESULT
+proc grDbgRegisterMsgCallback*(pfnMsgCallback: GrDbgMsgCallbackFunction, pUserData: pointer): GR_RESULT
+proc grDbgUnregisterMsgCallback*(pfnMsgCallback: GrDbgMsgCallbackFunction): GR_RESULT
+proc grDbgSetMessageFilter*(device: GrDevice, msgCode: GrDbgMsgCode, filter: GrDbgMsgFilter): GR_RESULT
+proc grDbgSetObjectTag*(obj: GrBaseObject, tagSize: GrSize, pTag: pointer): GR_RESULT
+proc grDbgSetGlobalOption*(dbgOption: GrDbgGlobalOption, dataSize: GrSize, pData: pointer): GR_RESULT
+proc grDbgSetDeviceOption*(device: GrDevice, dbgOption: GrDbgDeviceOption, dataSize: GrSize, pData: pointer): GR_RESULT
+proc grCmdDbgMarkerBegin*(cmdBuffer: GrCmdBuffer, pMarker: ptr GrChar)
+proc grCmdDbgMarkerEnd*(cmdBuffer: GrCmdBuffer)
+{.pop.} # callConv, importc, dynlib
