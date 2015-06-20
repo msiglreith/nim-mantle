@@ -9,8 +9,6 @@ type
   # Object Types
   GrWsiWinDisplay* = GrObject
 
-# todo: error/return codes
-
 # Constants
 const
   GR_MAX_GAMMA_RAMP_CONTROL_POINTS*: GrSize = 1 # todo: verify!
