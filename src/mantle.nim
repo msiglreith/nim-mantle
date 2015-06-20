@@ -16,6 +16,7 @@ type
   GrUint8* = uint8
   GrUint32* = uint32
   GrUint64* = uint64
+  GrByte* = byte
   GrBool* = bool
   GrChar* = cchar
   GrFloat* = cfloat
@@ -706,7 +707,7 @@ type
     descriptorCount*: GrUint
     pDescriptorInfo*: ptr GrDescriptorSlotInfo
 
-  GrDescriptorSlotInfoUnion {.final.} = object
+  GrDescriptorSlotInfoUnion* {.final, union.} = object # todo: public?
       shaderEntityIndex*: GrUint
       pNextLevelSet*: ptr GrDescriptorSetMapping
 
