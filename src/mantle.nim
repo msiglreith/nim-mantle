@@ -1,6 +1,8 @@
 
 ## Nim wrapper for ``Mantle``
 
+import windows # Wsi
+
 {.deadCodeElim: on.}
 
 # todo: other OS, x86/x86_64
@@ -61,6 +63,12 @@ type
   GrMsaaStateObject* = GrStateObject
   GrRasterStateObject* = GrStateObject
   GrViewportStateObject* = GrStateObject
+
+  # Wsi
+  GrWsiWinDisplay* = GrObject
+
+  # Extensions
+  GrBorderColorPalette* = GrObject
 
 # Error codes / result
 type
@@ -130,6 +138,12 @@ const
   GR_MAX_MEMORY_HEAPS*: GrSize = 8 # todo: verify!
   GR_MAX_VIEWPORTS*: GrSize = 8 # todo: verify!
 
+  # Wsi
+  GR_MAX_GAMMA_RAMP_CONTROL_POINTS*: GrSize = 1 # todo: verify!
+
+  # Extension
+  GR_MAX_MSAA_RASTERIZER_SAMPLES*: GrSize = 1 # todo: verify!
+
 # Enumerations
 type
   GrAtomicOp* {.size: sizeof(GrEnum).} = enum
@@ -160,6 +174,9 @@ type
     GR_BORDER_COLOR_WHITE = 0x1c00
     GR_BORDER_COLOR_TRANSPARENT_BLACK = 0x1c01
     GR_BORDER_COLOR_OPAQUE_BLACK = 0x1c02
+
+    # Extension
+    GR_EXT_BORDER_COLOR_TYPE_PALETTE_ENTRY_0 = 0x0030a000
 
   GrBlend* {.size: sizeof(GrEnum).} = enum
     GR_BLEND_ZERO = 0x2900
@@ -291,6 +308,15 @@ type
     GR_IMAGE_STATE_DATA_TRANSFER_DESTINATION = 0x1311
     GR_IMAGE_STATE_DISCARD = 0x131f
 
+    # Wsi
+    GR_WSI_WIN_IMAGE_STATE_PRESENT_WINDOWED = 0x00200000
+    GR_WSI_WIN_IMAGE_STATE_PRESENT_FULLSCREEN = 0x00200001
+
+    # Extension
+    GR_EXT_IMAGE_STATE_GRAPHICS_SHADER_FMASK_LOOKUP = 0x00300100
+    GR_EXT_IMAGE_STATE_COMPUTE_SHADER_FMASK_LOOKUP = 0x00300101
+    GR_EXT_IMAGE_STATE_DATA_TRANSFER_DMA_QUEUE = 0x00300102
+
   GrImageTiling* {.size: sizeof(GrEnum).} = enum
     GR_LINEAR_TILING = 0x1500
     GR_OPTIMAL_TILING = 0x1501
@@ -322,6 +348,19 @@ type
     GR_INFO_TYPE_MEMORY_REQUIREMENTS = 0x6800
     GR_INFO_TYPE_PARENT_DEVICE = 0x6801
     GR_INFO_TYPE_PARENT_PHYSICAL_GPU = 0x6802
+
+    # Wsi
+    GR_WSI_WIN_INFO_TYPE_QUEUE_PROPERTIES = 0x00206800
+    GR_WSI_WIN_INFO_TYPE_DISPLAY_PROPERTIES = 0x00206801
+    GR_WSI_WIN_INFO_TYPE_GAMMA_RAMP_CAPABILITIES = 0x00206802
+    GR_WSI_WIN_INFO_TYPE_DISPLAY_FREESYNC_SUPPORT = 0x00206803
+    GR_WSI_WIN_INFO_TYPE_PRESENTABLE_IMAGE_PROPERTIES = 0x00206804
+    GR_WSI_WIN_INFO_TYPE_EXTENDED_DISPLAY_PROPERTIES = 0x00206805
+
+    # Extension
+    GR_EXT_INFO_TYPE_PHYSICAL_GPU_SUPPORTED_AXL_VERSION = 0x00306100
+    GR_EXT_INFO_TYPE_QUEUE_BORDER_COLOR_PALETTE_PROPERTIES = 0x00306800
+    GR_EXT_INFO_TYPE_QUEUE_CONTROL_FLOW_PROPERTIES = 0x00306801
 
   GrLogicOp* {.size: sizeof(GrEnum).} = enum
     GR_LOGIC_OP_COPY = 0x2c00
@@ -366,6 +405,10 @@ type
     GR_MEMORY_STATE_DATA_TRANSFER_SOURCE = 0x120d
     GR_MEMORY_STATE_DATA_TRANSFER_DESTINATION = 0x120e
 
+    # Extension
+    GR_EXT_MEMORY_STATE_COPY_OCCLUSION_DATA = 0x00300000
+    GR_EXT_MEMORY_STATE_CMD_CONTROL = 0x00300001
+
   GrNumFormat* {.size: sizeof(GrEnum).} = enum
     GR_NUM_FMT_UNDEFINED = 0
     GR_NUM_FMT_UNORM = 1
@@ -408,6 +451,10 @@ type
   GrQueueType* {.size: sizeof(GrEnum).} = enum
     GR_QUEUE_UNIVERSAL = 0x1000
     GR_QUEUE_COMPUTE = 0x1001
+
+    # Extension
+    GR_EXT_QUEUE_DMA = 0x00300200
+    GR_EXT_QUEUE_TIMER = 0x00300201
 
   GrStateBindPoint* {.size: sizeof(GrEnum).} = enum
     GR_STATE_BIND_VIEWPORT = 0x1f00
@@ -524,6 +571,23 @@ type
     GR_DBG_OBJECT_PINNED_GPU_MEMORY = 0x0002091b
     GR_DBG_OBJECT_INTERNAL_GPU_MEMORY = 0x0002091c
 
+  # Wsi
+  GrWsiWinPresentMode* {.size: sizeof(GrEnum).} = enum
+    GR_WSI_WIN_PRESENT_MODE_WINDOWED = 0x00200200
+    GR_WSI_WIN_PRESENT_MODE_FULLSCREEN = 0x00200201
+
+  GrWsiWinRotationAngle* {.size: sizeof(GrEnum).} = enum
+    GR_WSI_WIN_ROTATION_ANGLE_0 = 0x00200100
+    GR_WSI_WIN_ROTATION_ANGLE_90 = 0x00200101
+    GR_WSI_WIN_ROTATION_ANGLE_180 = 0x00200102
+    GR_WSI_WIN_ROTATION_ANGLE_270 = 0x00200103
+
+  # Extension
+  GrExtOcclusionCondition* {.size: sizeof(GrEnum).} = enum
+    GR_EXT_OCCLUSION_CONDITION_VISIBLE = 0x00300300
+    GR_EXT_OCCLUSION_CONDITION_INVISIBLE = 0x00300301
+
+
 # Flags
 const # GR_CMD_BUFFER_BUILD_FLAGS
   GR_CMD_BUFFER_OPTIMIZE_GPU_SMALL_BATCH* = 0x00000001
@@ -604,6 +668,36 @@ const # GR_SEMAPHORE_CREATE_FLAGS
 const # GR_SHADER_CREATE_FLAGS
   GR_SHADER_CREATE_ALLOW_RE_Z* = 0x00000001
 
+# Wsi
+const # GR_WSI_WIN_EXTENDED_DISPLAY_FLAGS
+  GR_WSI_WIN_WINDOWED_VBLANK_WAIT* = 0x00000001
+  GR_WSI_WIN_WINDOWED_GET_SCANLINE* = 0x00000002
+
+const # GR_WSI_WIN_IMAGE_CREATE_FLAGS
+  GR_WSI_WIN_IMAGE_CREATE_FULLSCREEN_PRESENT* = 0x00000001
+  GR_WSI_WIN_IMAGE_CREATE_STEREO* = 0x00000002
+
+const # GR_WSI_WIN_PRESENT_FLAGS
+  GR_WSI_WIN_PRESENT_FULLSCREEN_DONOTWAIT* = 0x00000001
+  GR_WSI_WIN_PRESENT_FULLSCREEN_STEREO* = 0x00000002
+
+const # GR_WSI_WIN_PRESENT_SUPPORT_FLAGS
+  GR_WSI_WIN_FULLSCREEN_PRESENT_SUPPORTED* = 0x00000001
+  GR_WSI_WIN_WINDOWED_PRESENT_SUPPORTED* = 0x00000002
+
+# Extension
+const # GR_EXT_CONTROL_FLOW_FEATURE_FLAGS
+  GR_EXT_CONTROL_FLOW_OCCLUSION_PREDICATION* = 0x00000001
+  GR_EXT_CONTROL_FLOW_MEMORY_PREDICATION* = 0x00000002
+  GR_EXT_CONTROL_FLOW_CONDITIONAL_EXECUTION* = 0x00000004
+  GR_EXT_CONTROL_FLOW_LOOP_EXECUTION* = 0x00000008
+
+const # GR_EXT_ACCESS_CLIENT
+  GR_EXT_ACCESS_DEFAULT* = 0x00000000
+  GR_EXT_ACCESS_CPU* = 0x01000000
+  GR_EXT_ACCESS_UNIVERSAL_QUEUE* = 0x02000000
+  GR_EXT_ACCESS_COMPUTE_QUEUE* = 0x04000000
+  GR_EXT_ACCESS_DMA_QUEUE* = 0x08000000
 
 # Callbacks
 type
@@ -1088,6 +1182,105 @@ type
     realStartPage*: GrGpuSize
     pageCount*: GrGpuSize
 
+  # Wsi
+  GrRgbFloat* {.final.} = object
+    red*: GrFloat
+    green*: GrFloat
+    blue*: GrFloat
+
+  GrWsiWinDisplayMode* {.final.} = object
+    extent*: GrExtent2d
+    format*: GrFormat
+    refreshRate*: GrUint
+    stereo*: GrBool
+    crossDisplayPresent*: GrBool
+
+  GrWsiWinDisplayProperties* {.final.} = object
+    hMonitor*: windows.HMONITOR
+    displayName*: array[GR_MAX_DEVICE_NAME_LEN, GrChar]
+
+  GrWsiWinExtendedDisplayProperties* {.final.} = object
+    extendedProperties: GrFlags
+
+  GrWsiWinGammaRamp* {.final.} = object
+    scale: GrRgbFloat
+    offset: GrRgbFloat
+    gammaCurve: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrRgbFloat]
+
+  GrWsiWinGammaRampCapabilites* {.final.} = object
+    supportsScaleAndOffset: GrBool
+    minConvertedValue: GrFloat
+    maxConvertedValue: GrFloat
+    controlPointCount: GrUint
+    controlPointPositions: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrFloat]
+
+  GrWsiWinPresentInfo* {.final.} = object
+    hWndDest: windows.HWND
+    srcImage: GrImage
+    presentMode: GrWsiWinPresentMode
+    presentInterval: GrUint # todo: range usable? 0-4
+    flags: GrFlags
+
+  GrWsiWinPresentableImageCreateInfo* {.final.} = object
+    format: GrFormat
+    usage: GrFlags
+    extent: GrExtent2d
+    display: GrWsiWinDisplay
+    flags: GrFlags
+
+  GrWsiWinPresentableImageProperties* {.final.} = object
+    createInfo: GrWsiWinPresentableImageCreateInfo
+    mem: GrGpuMemory
+
+  GrWsiWinQueueProperties* {.final.} = object
+    presentSupport: GrFlags
+
+  # Extension
+  GrPhysicalGpuSupportedAxlVersion* {.final.} = object
+    minVersion*: GrUint32
+    maxVersion*: GrUint32
+
+  GrBorderColorPaletteProperties* {.final.} = object
+    maxPaletteSize*: GrUint
+
+  GrBorderColorPaletteCreateInfo* {.final.} = object
+    paletteSize*: GrUint
+
+  GrAdvancedMsaaStateCreateInfo* {.final.} = object
+    coverageSamples*: GrUint
+    pixelShaderSamples*: GrUint
+    depthStencilSamples*: GrUint
+    colorTargetSamples*: GrUint
+    sampleMask*: GrSampleMask
+    sampleClusters*: GrUint
+    alphaToCoverageSamples*: GrUint
+    disableAlphaToCoverageDither*: GrBool
+    customSamplePatternEnable*: GrBool
+    customSamplePattern*: GrMsaaQuadSamplePattern
+
+  GrFmaskImageViewCreateInfo* {.final.} = object
+    image*: GrImage
+    baseArraySlice*: GrUint
+    arraySize*: GrUint
+
+  GrMsaaQuadSamplePattern* {.final.} = object
+    topLeft*: array[GR_MAX_MSAA_RASTERIZER_SAMPLES, GrOffset2d]
+    topRight*: array[GR_MAX_MSAA_RASTERIZER_SAMPLES, GrOffset2d]
+    bottomLeft*: array[GR_MAX_MSAA_RASTERIZER_SAMPLES, GrOffset2d]
+    bottomRight*: array[GR_MAX_MSAA_RASTERIZER_SAMPLES, GrOffset2d]
+
+  GrQueueControlFlowProperties* {.final.} = object
+    maxNestingLimit*: GrUint
+    controlFlowOperations*: GrFlags
+
+  GrGpuTimestampCalibrationUnion* {.final, union.} = object # todo: public?
+    cpuWinPerfCounter*: GrUint64
+    padding*: array[16, GrByte]
+
+  GrGpuTimestampCalibration* {.final.} = object
+    gpuTimestamp*: GrUint64
+    union*: GrGpuTimestampCalibrationUnion
+
 
 # Functions
 {.push callConv: stdcall, importc, dynLib: libmantle}
@@ -1232,4 +1425,51 @@ proc grDbgSetGlobalOption*(dbgOption: GrDbgGlobalOption, dataSize: GrSize, pData
 proc grDbgSetDeviceOption*(device: GrDevice, dbgOption: GrDbgDeviceOption, dataSize: GrSize, pData: pointer): GR_RESULT
 proc grCmdDbgMarkerBegin*(cmdBuffer: GrCmdBuffer, pMarker: ptr GrChar)
 proc grCmdDbgMarkerEnd*(cmdBuffer: GrCmdBuffer)
+
+
+# Wsi
+proc grWsiWinGetDisplays*(device: GrDevice, pDisplayCount: ptr GrUint, pDisplayList: ptr GrWsiWinDisplay): GR_RESULT
+proc grWsiWinGetDisplayModeList*(display: GrWsiWinDisplay, pDisplayModeCount: ptr GrUint, pDisplayModeList: ptr GrWsiWinDisplayMode): GR_RESULT
+proc grWsiWinTakeFullscreenOwnership*(display: GrWsiWinDisplay, image: GrImage): GR_RESULT
+proc grWsiWinReleaseFullscreenOwnership*(display: GrWsiWinDisplay): GR_RESULT
+proc grWsiWinSetGammaRamp*(display: GrWsiWinDisplay, pGammaRamp: ptr GrWsiWinGammaRamp): GR_RESULT
+proc grWsiWinWaitForVerticalBlank*(display: GrWsiWinDisplay): GR_RESULT
+proc grWsiWinGetScanLine*(display: GrWsiWinDisplay, pScanLine: ptr GrInt): GR_RESULT
+proc grWsiWinCreatePresentableImage*(device: GrDevice, pCreateInfo: ptr GrWsiWinPresentableImageCreateInfo, pImage: ptr GrImage, pMem: ptr GrGpuMemory): GR_RESULT
+proc grWsiWinQueuePresent*(queue: GrQueue, pPresentInfo: ptr GrWsiWinPresentInfo): GR_RESULT
+proc grWsiWinSetMaxQueuedFrames*(device: GrDevice, maxFrames: GrUint): GR_RESULT
+
+
+# Extension
+# Library Versioning
+proc grGetExtensionLibraryVersion*(): GrUint32
+
+# Border Color Palette Extension
+proc grCreateBorderColorPalette*(device: GrDevice, pCreateInfo: ptr GrBorderColorPaletteCreateInfo, pPalette: ptr GrBorderColorPalette): GrResult
+proc grUpdateBorderColorPalette*(palette: GrBorderColorPalette, firstEntry: GrUint, entryCount: GrUint, pEntries: ptr GrFloat): GrResult
+proc grCmdBindBorderColorPalette*(cmdBuffer: GrCmdBuffer, pipelineBindPoint: GrPipelineBindPoint, palette: GrBorderColorPalette)
+
+# Advanced Multisampling Extension
+proc grCreateAdvancedMsaaState*(device: GrDevice, pCreateInfo: ptr GrAdvancedMsaaStateCreateInfo, pState: ptr GrMsaaStateObject): GrResult
+proc grCreateFmaskImageView*(device: GrDevice, pCreateInfo: ptr GrFmaskImageViewCreateInfo, pView: ptr GrImageView): GrResult
+
+# Copy Occlusion Query Data Extension
+proc grCmdCopyOcclusionData*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, startQuery: GrUint, queryCount: GrUint, destMem: GrGpuMemory, destOffset: GrGpuSize, accumulateData: GrBool) # todo: why does a grCmd* function return sth? typo in the documentation?
+
+# Command Buffer Control Flow Extension
+proc grCmdSetOcclusionPredication*(cmdBuffer: GrCmdBuffer, queryPool: GrQueryPool, slot: GrUint, condition: GrExtOcclusionCondition, waitResults: GrBool, accumulateData: GrBool)
+proc grCmdResetOcclusionPredication*(cmdBuffer: GrCmdBuffer)
+proc grCmdSetMemoryPredication*(cmdBuffer: GrCmdBuffer, mem: GrGpuMemory, offset: GrGpuSize)
+proc grCmdResetMemoryPredication*(cmdBuffer: GrCmdBuffer)
+proc grCmdIf*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, srcOffset: GrGpuSize, data: GrUint64, mask: GrUint64, function: GrCompareFunc)
+proc grCmdElse*(cmdBuffer: GrCmdBuffer)
+proc grCmdEndIf*(cmdBuffer: GrCmdBuffer)
+proc grCmdWhile*(cmdBuffer: GrCmdBuffer, srcMem: GrGpuMemory, srcOffset: GrGpuSize, data: GrUint64, mask: GrUint64, function: GrCompareFunc)
+proc grCmdEndWhile*(cmdBuffer: GrCmdBuffer)
+
+# Timer Queue Extension
+proc grQueueDelay*(queue: GrQueue, delay: GrFloat): GrResult
+
+# GPU Timestamp Calibration Extension
+proc grCalibrateGpuTimestamp*(device: GrDevice, pCalibrationData: ptr GrGpuTimestampCalibration): GrResult
 {.pop.} # callConv, importc, dynlib
