@@ -37,9 +37,9 @@ type
 
   GrObject* = GrBaseObject
   GrDevice* = GrBaseObject
-  GrPhysicalGpu* = uint64 # todo: verify!
-  GrGpuMemory* = uint64 # todo: verify!
-  GrQueue* = uint64 # todo: verify
+  GrPhysicalGpu* = uint64
+  GrGpuMemory* = uint64
+  GrQueue* = uint64
 
   GrCmdBuffer* = GrObject
   GrDescriptorSet* = GrObject
@@ -130,13 +130,13 @@ type
 const
   GR_API_VERSION*: GrUint32 = 1 # todo: verify!
 
-  GR_MAX_COLOR_TARGETS*: GrSize = 16 # todo: verify!
-  GR_MAX_DESCRIPTOR_SETS*: GrSize = 1 # todo: verify!
+  GR_MAX_COLOR_TARGETS*: GrSize = 8
+  GR_MAX_DESCRIPTOR_SETS*: GrSize = 128 # todo: verify!
   GR_MAX_DEVICE_NAME_LEN*: GrSize = 128 # todo: verify!
   GR_MAX_PHYSICAL_GPUS*: GrSize = 8 # todo: verify!
-  GR_MAX_PHYSICAL_GPU_NAME*: GrSize = 128 # todo: verify!
+  GR_MAX_PHYSICAL_GPU_NAME*: GrSize = 256
   GR_MAX_MEMORY_HEAPS*: GrSize = 8 # todo: verify!
-  GR_MAX_VIEWPORTS*: GrSize = 8 # todo: verify!
+  GR_MAX_VIEWPORTS*: GrSize = 16
 
   # Wsi
   GR_MAX_GAMMA_RAMP_CONTROL_POINTS*: GrSize = 1 # todo: verify!
@@ -704,7 +704,7 @@ type
   GrAllocFunction* = proc(size: GrSize, alignment: GrSize, allocType: GrEnum): pointer {.stdcall.}
   GrFreeFunction* = proc(pMem: pointer) {.stdcall.}
 
-  GrDbgMsgCallbackFunction* = proc(msgTyp: GrDbgMsgType, validationLevel: GrValidationLevel, srcObject: GrBaseObject, location: GrSize, msgCode: GrDbgMsgCode, pMsg: ptr GrChar, pUserData: pointer) {.stdcall.}
+  GrDbgMsgCallbackFunction* = proc(msgTyp: GrDbgMsgType, validationLevel: GrValidationLevel, srcObject: GrBaseObject, location: GrSize, msgCode: GrDbgMsgCode, pMsg: cstring, pUserData: pointer) {.stdcall.}
 
 
 # Data Structures
@@ -714,9 +714,9 @@ type
     pfnFree*: GrFreeFunction
 
   GrApplicationInfo* {.final.} = object
-    pAppName*: ptr GrChar
+    pAppName*: cstring
     appVersion*: GrUint32
-    pEngineName*: ptr GrChar
+    pEngineName*: cstring
     engineVersion*: GrUint32
     apiVersion*: GrUint32
 
@@ -814,7 +814,7 @@ type
     queueRecordCount*: GrUint
     pRequestedQueues*: ptr GrDeviceQueueCreateInfo
     extensionCount*: GrUint
-    ppEnabledExtensionNames*: ptr GrChar # todo*: ptr of ptr?
+    ppEnabledExtensionNames*: ptr cstring
     maxValidationLevel*: GrValidationLevel
     flags*: GrFlags
 
@@ -1152,7 +1152,7 @@ type
 
   GrShaderCreateInfo* {.final.} = object
     codeSize*: GrSize
-    pCode*: ptr GrChar
+    pCode*: cstring
     flags*: GrFlags
 
   GrSubresourceLayout* {.final.} = object
@@ -1198,6 +1198,8 @@ type
   GrWsiWinDisplayProperties* {.final.} = object
     hMonitor*: windows.HMONITOR
     displayName*: array[GR_MAX_DEVICE_NAME_LEN, GrChar]
+    desktopCoordinates: GrRect
+    rotation: GrWsiWinRotationAngle
 
   GrWsiWinExtendedDisplayProperties* {.final.} = object
     extendedProperties: GrFlags
@@ -1291,7 +1293,7 @@ proc grCreateDevice*(gpu: GrPhysicalGpu, pCreateInfo: ptr GrDeviceCreateInfo, pD
 proc grDestroyDevice*(device: GrDevice): GR_RESULT
 
 # Extension Discovery Functions
-proc grGetExtensionSupport*(gpu: GrPhysicalGpu, pExtName: ptr GrChar): GR_RESULT
+proc grGetExtensionSupport*(gpu: GrPhysicalGpu, pExtName: cstring): GR_RESULT
 
 # Queue Functions
 proc grGetDeviceQueue*(device: GrDevice, queueType: GrQueueType, queueId: GrUint, pQueue: ptr GrQueue): GR_RESULT
@@ -1423,7 +1425,7 @@ proc grDbgSetMessageFilter*(device: GrDevice, msgCode: GrDbgMsgCode, filter: GrD
 proc grDbgSetObjectTag*(obj: GrBaseObject, tagSize: GrSize, pTag: pointer): GR_RESULT
 proc grDbgSetGlobalOption*(dbgOption: GrDbgGlobalOption, dataSize: GrSize, pData: pointer): GR_RESULT
 proc grDbgSetDeviceOption*(device: GrDevice, dbgOption: GrDbgDeviceOption, dataSize: GrSize, pData: pointer): GR_RESULT
-proc grCmdDbgMarkerBegin*(cmdBuffer: GrCmdBuffer, pMarker: ptr GrChar)
+proc grCmdDbgMarkerBegin*(cmdBuffer: GrCmdBuffer, pMarker: cstring)
 proc grCmdDbgMarkerEnd*(cmdBuffer: GrCmdBuffer)
 
 
