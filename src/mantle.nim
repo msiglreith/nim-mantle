@@ -814,7 +814,7 @@ type
     queueRecordCount*: GrUint
     pRequestedQueues*: ptr GrDeviceQueueCreateInfo
     extensionCount*: GrUint
-    ppEnabledExtensionNames*: ptr cstring
+    ppEnabledExtensionNames*: cstringArray
     maxValidationLevel*: GrValidationLevel
     flags*: GrFlags
 
