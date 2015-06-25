@@ -5,7 +5,6 @@ import windows # Wsi
 
 {.deadCodeElim: on.}
 
-# todo: other OS, x86/x86_64
 when defined(windows):
   const libmantle* = "mantle64.dll"
 
@@ -25,7 +24,7 @@ type
   GrSize* = csize
 
   GrEnum* = cuint
-  GrFlags* = uint32 # todo: verify!
+  GrFlags* = uint32
 
   GrDbgMsgCode* = GrEnum # todo:
 
@@ -860,7 +859,7 @@ type
     flags*: GrFlags
 
   GrFormat* {.final.} = object
-    channelFormat *: GrChannelFormat # todo*: 16bit
+    channelFormat*: GrChannelFormat # todo*: 16bit
     numericFormat*: GrNumFormat # todo*: 16bit
 
   GrFormatProperties* {.final.} = object
