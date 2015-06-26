@@ -6,7 +6,12 @@ import windows # Wsi
 {.deadCodeElim: on.}
 
 when defined(windows):
-  const libmantle* = "mantle64.dll"
+  when defined(x86):
+    const libmantle = "mantle32.dll"
+    const libmantleaxl = "mantleaxl32.dll"
+  else:
+    const libmantle* = "mantle64.dll"
+    const libmantleaxl = "mantleaxl64.dll"
 
 # Types
 type
@@ -1439,9 +1444,10 @@ proc grWsiWinGetScanLine*(display: GrWsiWinDisplay, pScanLine: ptr GrInt): GR_RE
 proc grWsiWinCreatePresentableImage*(device: GrDevice, pCreateInfo: ptr GrWsiWinPresentableImageCreateInfo, pImage: ptr GrImage, pMem: ptr GrGpuMemory): GR_RESULT
 proc grWsiWinQueuePresent*(queue: GrQueue, pPresentInfo: ptr GrWsiWinPresentInfo): GR_RESULT
 proc grWsiWinSetMaxQueuedFrames*(device: GrDevice, maxFrames: GrUint): GR_RESULT
+{.pop.} # callConv, importc, dynlib
 
-
-# Extension
+# Extension Functions
+{.push callConv: stdcall, importc, dynLib: libmantleaxl}
 # Library Versioning
 proc grGetExtensionLibraryVersion*(): GrUint32
 
