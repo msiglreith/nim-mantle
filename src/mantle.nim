@@ -26,7 +26,7 @@ type
   GrEnum* = cuint
   GrFlags* = uint32
 
-  GrDbgMsgCode* = GrEnum # todo:
+  GrDbgMsgCode* = GrEnum # todo: verify!
 
   GrGpuSize* = csize # todo: verify!
   GrSampleMask* = uint32 # todo: verify!
@@ -205,7 +205,7 @@ type
     GR_BLEND_FUNC_MIN = 0x2a03
     GR_BLEND_FUNC_MAX = 0x2a04
 
-  GrChannelFormat* {.size: sizeof(GrEnum).} = enum
+  GrChannelFormat* {.size: sizeof(uint16).} = enum # todo: used by GrFormat as 16-bit, temporary workaround
     GR_CH_FMT_UNDEFINED = 0
     GR_CH_FMT_R4G4 = 1
     GR_CH_FMT_R4G4B4A4 = 2
@@ -408,7 +408,7 @@ type
     GR_EXT_MEMORY_STATE_COPY_OCCLUSION_DATA = 0x00300000
     GR_EXT_MEMORY_STATE_CMD_CONTROL = 0x00300001
 
-  GrNumFormat* {.size: sizeof(GrEnum).} = enum
+  GrNumFormat* {.size: sizeof(uint16).} = enum # todo: used by GrFormat as 16-bit, temporary workaround
     GR_NUM_FMT_UNDEFINED = 0
     GR_NUM_FMT_UNORM = 1
     GR_NUM_FMT_SNORM = 2
@@ -859,8 +859,8 @@ type
     flags*: GrFlags
 
   GrFormat* {.final.} = object
-    channelFormat*: GrChannelFormat # todo*: 16bit
-    numericFormat*: GrNumFormat # todo*: 16bit
+    channelFormat*: GrChannelFormat # note: 16-bit
+    numericFormat*: GrNumFormat # note: 16-bit
 
   GrFormatProperties* {.final.} = object
     linearTilingFeatures*: GrFlags
