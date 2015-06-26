@@ -890,7 +890,7 @@ type
     extent*: GrExtent3d
 
   GrImageCreateInfo* {.final.} = object
-    imageType*: GrIndexType
+    imageType*: GrImageType
     format*: GrFormat
     extent*: GrExtent3d
     mipLevels*: GrUint
@@ -1197,44 +1197,44 @@ type
   GrWsiWinDisplayProperties* {.final.} = object
     hMonitor*: windows.HMONITOR
     displayName*: array[GR_MAX_DEVICE_NAME_LEN, GrChar]
-    desktopCoordinates: GrRect
-    rotation: GrWsiWinRotationAngle
+    desktopCoordinates*: GrRect
+    rotation*: GrWsiWinRotationAngle
 
   GrWsiWinExtendedDisplayProperties* {.final.} = object
-    extendedProperties: GrFlags
+    extendedProperties*: GrFlags
 
   GrWsiWinGammaRamp* {.final.} = object
-    scale: GrRgbFloat
-    offset: GrRgbFloat
-    gammaCurve: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrRgbFloat]
+    scale*: GrRgbFloat
+    offset*: GrRgbFloat
+    gammaCurve*: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrRgbFloat]
 
   GrWsiWinGammaRampCapabilites* {.final.} = object
-    supportsScaleAndOffset: GrBool
-    minConvertedValue: GrFloat
-    maxConvertedValue: GrFloat
-    controlPointCount: GrUint
-    controlPointPositions: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrFloat]
+    supportsScaleAndOffset*: GrBool
+    minConvertedValue*: GrFloat
+    maxConvertedValue*: GrFloat
+    controlPointCount*: GrUint
+    controlPointPositions*: array[GR_MAX_GAMMA_RAMP_CONTROL_POINTS, GrFloat]
 
   GrWsiWinPresentInfo* {.final.} = object
-    hWndDest: windows.HWND
-    srcImage: GrImage
-    presentMode: GrWsiWinPresentMode
-    presentInterval: GrUint # todo: range usable? 0-4
-    flags: GrFlags
+    hWndDest*: windows.HWND
+    srcImage*: GrImage
+    presentMode*: GrWsiWinPresentMode
+    presentInterval*: GrUint # todo: range usable? 0-4
+    flags*: GrFlags
 
   GrWsiWinPresentableImageCreateInfo* {.final.} = object
-    format: GrFormat
-    usage: GrFlags
-    extent: GrExtent2d
-    display: GrWsiWinDisplay
-    flags: GrFlags
+    format*: GrFormat
+    usage*: GrFlags
+    extent*: GrExtent2d
+    display*: GrWsiWinDisplay
+    flags*: GrFlags
 
   GrWsiWinPresentableImageProperties* {.final.} = object
-    createInfo: GrWsiWinPresentableImageCreateInfo
-    mem: GrGpuMemory
+    createInfo*: GrWsiWinPresentableImageCreateInfo
+    mem*: GrGpuMemory
 
   GrWsiWinQueueProperties* {.final.} = object
-    presentSupport: GrFlags
+    presentSupport*: GrFlags
 
   # Extension
   GrPhysicalGpuSupportedAxlVersion* {.final.} = object
