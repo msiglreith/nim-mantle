@@ -34,16 +34,16 @@ type
   GrDbgMsgCode* = GrEnum # todo: verify!
 
   GrGpuSize* = csize # todo: verify!
-  GrSampleMask* = uint32 # todo: verify!
+  GrSampleMask* = GrUint32 # todo: verify!
 
   # Object Types
-  GrBaseObject* = uint64
+  GrBaseObject* = GrUint64
 
   GrObject* = GrBaseObject
   GrDevice* = GrBaseObject
-  GrPhysicalGpu* = uint64
-  GrGpuMemory* = uint64
-  GrQueue* = uint64
+  GrPhysicalGpu* = GrUint64
+  GrGpuMemory* = GrUint64
+  GrQueue* = GrUint64
 
   GrCmdBuffer* = GrObject
   GrDescriptorSet* = GrObject
@@ -133,6 +133,8 @@ type
 # Constants
 const
   GR_API_VERSION*: GrUint32 = 1 # todo: verify!
+
+  GrNullHandle*: GrUint64 = 0
 
   GR_MAX_COLOR_TARGETS*: GrSize = 8
   GR_MAX_DESCRIPTOR_SETS*: GrSize = 128 # todo: verify!
