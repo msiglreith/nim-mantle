@@ -132,10 +132,12 @@ type
 
 # Constants
 const
+  GR_NULL_HANDLE*: GrUint64 = 0
+
   GR_API_VERSION*: GrUint32 = 1 # todo: verify!
-
-  GrNullHandle*: GrUint64 = 0
-
+  
+  GR_LAST_MIP_OR_SLICE*: GrUint = high(GrUint)
+  
   GR_MAX_COLOR_TARGETS*: GrSize = 8
   GR_MAX_DESCRIPTOR_SETS*: GrSize = 128 # todo: verify!
   GR_MAX_DEVICE_NAME_LEN*: GrSize = 128 # todo: verify!

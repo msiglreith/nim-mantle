@@ -22,7 +22,7 @@ proc registerWindowClass*() =
 
   discard windows.RegisterClassA(addr class)
 
-proc buildWindow*(width: int32, height: int32) =
+proc buildWindow*(width: int32, height: int32): HWND =
   var hWindow = CreateWindowEx(
                 dwExStyle = 0,
                 lpClassName = className,
@@ -43,6 +43,8 @@ proc buildWindow*(width: int32, height: int32) =
 
   discard ShowWindow(hWindow, SW_SHOWDEFAULT)
   discard UpdateWindow(hWindow)
+  
+  return hWindow
 
 proc pollWindow*() =
   var msg: MSG
