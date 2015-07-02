@@ -1,6 +1,5 @@
 
 import mantle
-import windows
 import "../common/window_base.nim"
 
 proc dbgMsgProc(msgTyp: GrDbgMsgType, validationLevel: GrValidationLevel, srcObject: GrBaseObject, location: GrSize, msgCode: GrDbgMsgCode, pMsg: cstring, pUserData: pointer) {.stdcall.} =
