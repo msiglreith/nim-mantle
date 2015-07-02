@@ -140,14 +140,14 @@ const
   
   GR_MAX_COLOR_TARGETS*: GrSize = 8
   GR_MAX_DESCRIPTOR_SETS*: GrSize = 128 # todo: verify!
-  GR_MAX_DEVICE_NAME_LEN*: GrSize = 128 # todo: verify!
+  GR_MAX_DEVICE_NAME_LEN*: GrSize = 32
   GR_MAX_PHYSICAL_GPUS*: GrSize = 8 # todo: verify!
   GR_MAX_PHYSICAL_GPU_NAME*: GrSize = 256
-  GR_MAX_MEMORY_HEAPS*: GrSize = 8 # todo: verify!
+  GR_MAX_MEMORY_HEAPS*: GrSize = 8
   GR_MAX_VIEWPORTS*: GrSize = 16
 
   # Wsi
-  GR_MAX_GAMMA_RAMP_CONTROL_POINTS*: GrSize = 1 # todo: verify!
+  GR_MAX_GAMMA_RAMP_CONTROL_POINTS*: GrSize = 1025
 
   # Extension
   GR_MAX_MSAA_RASTERIZER_SAMPLES*: GrSize = 1 # todo: verify!
