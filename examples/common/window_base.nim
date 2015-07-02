@@ -23,15 +23,17 @@ proc registerWindowClass*() =
   discard windows.RegisterClassA(addr class)
 
 proc buildWindow*(width: int32, height: int32): HWND =
+  var rect = RECT(TopLeft: TPoint(x: 0, y: 0), BottomRight: TPoint(x: width, y: height))
+  discard AdjustWindowRectEx(addr rect, 0, cast[WINBOOL](false), 0)
   var hWindow = CreateWindowEx(
                 dwExStyle = 0,
                 lpClassName = className,
                 lpWindowName = "nim-mantle",
                 dwStyle = WS_THICKFRAME or WS_SYSMENU,
-                X = 0,
-                Y = 0,
-                nWidth = width,
-                nHeight = height,
+                X = rect.TopLeft.x,
+                Y = rect.TopLeft.y,
+                nWidth = rect.BottomRight.x - rect.TopLeft.x,
+                nHeight = rect.BottomRight.y - rect.TopLeft.y,
                 hWndParent = 0,
                 menu = 0,
                 hInstance = GetModuleHandle(nil),

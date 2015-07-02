@@ -3,19 +3,16 @@ import mantle
 import windows
 import "../common/window_base.nim"
 
-proc dbg_msg_proc(msgTyp: GrDbgMsgType, validationLevel: GrValidationLevel, srcObject: GrBaseObject, location: GrSize, msgCode: GrDbgMsgCode, pMsg: cstring, pUserData: pointer) {.stdcall.} =
+proc dbgMsgProc(msgTyp: GrDbgMsgType, validationLevel: GrValidationLevel, srcObject: GrBaseObject, location: GrSize, msgCode: GrDbgMsgCode, pMsg: cstring, pUserData: pointer) {.stdcall.} =
   echo "[", msgCode, "]: ", pMsg
 
 # create window
-registerWindowClass()
-var hWindow = buildWindow(1440, 900)
-
-var rect: RECT
-discard GetClientRect(hWindow, addr rect)
-
 let
-  width: GrInt = rect.BottomRight.x - rect.TopLeft.x
-  height: GrInt = rect.BottomRight.y - rect.TopLeft.y
+  width: GrInt = 1440
+  height: GrInt = 900
+  
+registerWindowClass()
+var hWindow = buildWindow(width, height)
  
 # init mantle
 var
@@ -23,7 +20,7 @@ var
   gpus: array[GR_MAX_PHYSICAL_GPUS, GrPhysicalGpu]
   gpuCount: GrUint
 
-discard grDbgRegisterMsgCallback(dbg_msg_proc, nil)
+discard grDbgRegisterMsgCallback(dbgMsgProc, nil)
 
 appInfo.apiVersion = GR_API_VERSION
 discard grInitAndEnumerateGpus(addr appInfo, nil, addr gpuCount, gpus)
